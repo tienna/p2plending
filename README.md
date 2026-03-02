@@ -1,6 +1,6 @@
-# P2P Lending dApp on Cardano
+# P2P Lending dApp trên Cardano
 
-Decentralized peer-to-peer lending platform built on **Cardano Preview Testnet** using **Aiken V3 smart contracts** and **MeshJS**. Borrowers lock NFT collateral on-chain; lenders fund loans trustlessly — no intermediaries, all logic enforced by smart contract.
+Nền tảng cho vay ngang hàng phi tập trung xây dựng trên **Cardano Preview Testnet** sử dụng **Aiken V3 smart contract** và **MeshJS**. Người vay khóa NFT làm tài sản đảm bảo on-chain; người cho vay cấp vốn không cần bên thứ ba — toàn bộ logic được thực thi bởi smart contract.
 
 ![Cardano](https://img.shields.io/badge/Cardano-Preview_Testnet-0033AD?logo=cardano)
 ![Aiken](https://img.shields.io/badge/Smart_Contract-Aiken_v1.1.2-purple)
@@ -10,37 +10,37 @@ Decentralized peer-to-peer lending platform built on **Cardano Preview Testnet**
 
 ---
 
-## Features
+## Tính năng
 
 | Chức năng | Mô tả |
 |---|---|
-| **Create Loan** | Borrower khóa NFT collateral vào smart contract, đặt điều khoản vay |
-| **Fund Loan** | Lender cấp ADA, kích hoạt khoản vay; borrower nhận ADA ngay lập tức |
-| **Repay** | Borrower trả gốc + lãi trước deadline → nhận lại NFT collateral |
-| **Liquidate** | Lender tịch thu NFT collateral nếu borrower không trả đúng hạn |
-| **Cancel** | Borrower huỷ khoản vay chưa được fund → nhận lại NFT |
+| **Tạo khoản vay** | Người vay khóa NFT tài sản đảm bảo vào smart contract, đặt điều khoản vay |
+| **Cấp vốn** | Người cho vay chuyển ADA, kích hoạt khoản vay; người vay nhận ADA ngay lập tức |
+| **Trả nợ** | Người vay hoàn trả gốc + lãi trước hạn → nhận lại NFT tài sản đảm bảo |
+| **Tịch thu tài sản** | Người cho vay thu hồi NFT nếu người vay không trả đúng hạn |
+| **Huỷ khoản vay** | Người vay huỷ khoản vay chưa được cấp vốn → nhận lại NFT |
 
 ---
 
-## Architecture Overview
+## Kiến trúc tổng quan
 
 ```
 ┌─────────────┐   CIP-30    ┌──────────────────┐   REST API   ┌─────────────────┐
-│   Browser   │ ──────────► │  Next.js Frontend │ ──────────► │  Blockfrost API │
+│  Trình duyệt│ ──────────► │ Frontend Next.js  │ ──────────► │  Blockfrost API │
 │  (Eternl /  │             │  (React + MeshJS) │             │  (Blockchain    │
 │   Nami)     │ ◄────────── │                   │ ◄────────── │   Indexer)      │
-└─────────────┘  sign tx    └──────────────────┘   UTxO data  └────────┬────────┘
-                                                                        │
-                                                              ┌─────────▼────────┐
-                                                              │  Cardano Preview │
-                                                              │  Testnet (Node)  │
-                                                              │                  │
-                                                              │  Script Address: │
-                                                              │  addr_test1w...  │
-                                                              └──────────────────┘
+└─────────────┘  ký giao dịch└──────────────────┘  dữ liệu UTxO└────────┬────────┘
+                                                                          │
+                                                              ┌───────────▼──────────┐
+                                                              │  Cardano Preview     │
+                                                              │  Testnet (Node)      │
+                                                              │                      │
+                                                              │  Script Address:     │
+                                                              │  addr_test1w...      │
+                                                              └──────────────────────┘
 ```
 
-**Không có backend server.** Toàn bộ trạng thái lưu trên blockchain — Blockfrost cung cấp REST API để đọc/ghi, smart contract Aiken thực thi logic nghiệp vụ on-chain.
+**Không có backend server riêng.** Toàn bộ trạng thái ứng dụng được lưu trên blockchain — Blockfrost cung cấp REST API để đọc/ghi dữ liệu, smart contract Aiken thực thi logic nghiệp vụ hoàn toàn on-chain.
 
 ---
 
@@ -50,20 +50,20 @@ Decentralized peer-to-peer lending platform built on **Cardano Preview Testnet**
 
 ### `p2p_lending.ak` — Lending Validator
 
-Quản lý toàn bộ vòng đời khoản vay qua 4 redeemers:
+Quản lý toàn bộ vòng đời khoản vay thông qua 4 redeemers:
 
 ```
-[Pending UTxO: NFT]
+[UTxO Pending: NFT]
        │
-       ├─ Cancel (borrower) → Borrower nhận lại NFT
+       ├─ Cancel (người vay) → Người vay nhận lại NFT
        │
-       └─ Fund (lender) → [Active UTxO: NFT + principal ADA]
-                                  │
-                                  ├─ Repay (trước hạn) → Lender nhận ADA, Borrower nhận NFT
-                                  └─ Liquidate (sau hạn) → Lender nhận NFT
+       └─ Fund (người cho vay) → [UTxO Active: NFT + ADA gốc]
+                                          │
+                                          ├─ Repay (trước hạn) → Người cho vay nhận ADA, người vay nhận lại NFT
+                                          └─ Liquidate (sau hạn) → Người cho vay nhận NFT
 ```
 
-**Datum (`LoanDatum`):**
+**Cấu trúc dữ liệu (`LoanDatum`):**
 
 ```aiken
 pub type LoanDatum {
@@ -81,11 +81,11 @@ pub type LoanDatum {
 
 ### `nft_policy.ak` — NFT Minting Policy
 
-Policy parameterized bởi issuer PKH — chỉ borrower mới có thể mint NFT collateral.
+Policy được tham số hoá bởi PKH của người phát hành — chỉ người vay mới có thể mint NFT tài sản đảm bảo.
 
 ---
 
-## Project Structure
+## Cấu trúc thư mục
 
 ```
 p2plending/
@@ -94,66 +94,66 @@ p2plending/
 │   ├── validators/
 │   │   ├── p2p_lending.ak          # Lending validator (Fund/Repay/Liquidate/Cancel)
 │   │   └── nft_policy.ak           # NFT minting policy
-│   ├── plutus.json                 # Compiled Plutus scripts (CBOR)
-│   └── aiken.toml                  # Project manifest (v1.1.2, Plutus V3)
+│   ├── plutus.json                 # Plutus scripts đã biên dịch (CBOR)
+│   └── aiken.toml                  # Cấu hình dự án (v1.1.2, Plutus V3)
 │
-├── frontend/                       # Next.js web app
+├── frontend/                       # Ứng dụng web Next.js
 │   ├── app/
 │   │   ├── layout.tsx              # Root layout
 │   │   └── page.tsx                # Single-page app (Navbar + Hero + Tabs)
 │   ├── components/
 │   │   ├── WalletConnect.tsx       # Kết nối ví Cardano (CIP-30)
 │   │   ├── CreateLoanPanel.tsx     # Form tạo khoản vay
-│   │   ├── LoanListPanel.tsx       # Danh sách Pending / Active loans
-│   │   ├── LoanCard.tsx            # Card hiển thị + thao tác từng khoản vay
-│   │   └── TxToast.tsx             # Toast thông báo sau giao dịch
+│   │   ├── LoanListPanel.tsx       # Danh sách khoản vay Pending / Active
+│   │   ├── LoanCard.tsx            # Hiển thị và thao tác từng khoản vay
+│   │   └── TxToast.tsx             # Thông báo sau khi giao dịch thành công
 │   ├── context/
-│   │   └── WalletContext.tsx       # Global wallet state (React Context)
+│   │   └── WalletContext.tsx       # Trạng thái ví toàn cục (React Context)
 │   ├── lib/
-│   │   └── lendingFunctions.ts     # Tx builder: createLoan, fundLoan, repayLoan...
-│   └── .env.local.example          # Template biến môi trường frontend
+│   │   └── lendingFunctions.ts     # Xây dựng giao dịch: createLoan, fundLoan, repayLoan...
+│   └── .env.local.example          # Mẫu biến môi trường frontend
 │
-├── offchain/                       # CLI scripts (TypeScript, headless)
+├── offchain/                       # Scripts CLI (TypeScript, headless)
 │   ├── src/
-│   │   ├── config.ts               # Script CBOR, provider, network config
-│   │   ├── lendingFunctions.ts     # Core tx building functions
-│   │   └── types.ts                # TypeScript types (LoanDatum, LoanUtxo)
+│   │   ├── config.ts               # Script CBOR, provider, cấu hình mạng
+│   │   ├── lendingFunctions.ts     # Hàm xây dựng giao dịch cốt lõi
+│   │   └── types.ts                # Kiểu TypeScript (LoanDatum, LoanUtxo)
 │   ├── scripts/
-│   │   ├── mint-collateral-nft.ts  # Mint NFT collateral cho borrower
+│   │   ├── mint-collateral-nft.ts  # Mint NFT tài sản đảm bảo cho người vay
 │   │   ├── test-create.ts          # E2E: Tạo khoản vay
-│   │   ├── test-fund.ts            # E2E: Fund khoản vay
+│   │   ├── test-fund.ts            # E2E: Cấp vốn
 │   │   ├── test-repay.ts           # E2E: Trả nợ
-│   │   ├── test-liquidate.ts       # E2E: Tịch thu collateral
+│   │   ├── test-liquidate.ts       # E2E: Tịch thu tài sản
 │   │   └── test-cancel.ts          # E2E: Huỷ khoản vay
-│   └── .env.example                # Template biến môi trường offchain
+│   └── .env.example                # Mẫu biến môi trường offchain
 │
 ├── docs/                           # Tài liệu kỹ thuật
-│   ├── smart-contract-architecture.md
-│   ├── app-architecture.md
-│   ├── installation.md
-│   └── user-guide.md
+│   ├── smart-contract-architecture.md   # Kiến trúc smart contract
+│   ├── app-architecture.md              # Kiến trúc ứng dụng & luồng dữ liệu
+│   ├── installation.md                  # Hướng dẫn cài đặt
+│   └── user-guide.md                    # Hướng dẫn sử dụng
 │
 └── README.md
 ```
 
 ---
 
-## Tech Stack
+## Công nghệ sử dụng
 
-| Layer | Technology |
+| Tầng | Công nghệ |
 |---|---|
 | Smart Contract | [Aiken](https://aiken-lang.org) v1.1.2 — Plutus V3 (Conway era) |
 | Frontend | [Next.js](https://nextjs.org) 16 + React 19 + TypeScript |
-| Styling | Tailwind CSS v4 |
+| Giao diện | Tailwind CSS v4 |
 | Cardano SDK | [MeshJS](https://meshjs.dev) v1.9.0-beta |
 | Blockchain API | [Blockfrost](https://blockfrost.io) (Preview Testnet) |
-| Wallet Support | Eternl, Nami (CIP-30) |
+| Ví hỗ trợ | Eternl, Nami (CIP-30) |
 
 ---
 
-## Quick Start
+## Bắt đầu nhanh
 
-### 1. Clone & cài dependencies
+### 1. Clone và cài đặt thư viện
 
 ```bash
 git clone https://github.com/tienna/p2plending.git
@@ -166,7 +166,7 @@ cd frontend && npm install && cd ..
 cd offchain && npm install && cd ..
 ```
 
-### 2. Cấu hình môi trường
+### 2. Cấu hình biến môi trường
 
 ```bash
 # Frontend
@@ -178,72 +178,72 @@ cp offchain/.env.example offchain/.env
 # Điền BLOCKFROST_API_KEY, ALICE_MNEMONIC, BOB_MNEMONIC
 ```
 
-> Lấy API key miễn phí tại [blockfrost.io](https://blockfrost.io) → tạo project **Preview**.
+> Lấy API key miễn phí tại [blockfrost.io](https://blockfrost.io) → tạo project với network **Preview**.
 
 ### 3. Chạy Frontend
 
 ```bash
 cd frontend
 npm run dev
-# → http://localhost:3000
+# → Truy cập http://localhost:3000
 ```
 
-### 4. (Tùy chọn) Chạy E2E test với CLI scripts
+### 4. (Tuỳ chọn) Chạy kiểm thử E2E với CLI scripts
 
 ```bash
 cd offchain
 
-# Mint NFT collateral cho Alice
+# Mint NFT tài sản đảm bảo cho Alice (người vay)
 npm run mint-nft
 # → Copy NFT_POLICY_ID vào .env
 
-# Test vòng đời khoản vay
-npm run test:create        # Tạo loan → lấy LOAN_TX_HASH
-LOAN_TX_HASH=<hash> npm run test:fund    # Fund
-LOAN_TX_HASH=<hash> npm run test:repay  # Repay
+# Kiểm thử toàn bộ vòng đời khoản vay
+npm run test:create                         # Tạo khoản vay → lấy LOAN_TX_HASH
+LOAN_TX_HASH=<hash> npm run test:fund       # Cấp vốn
+LOAN_TX_HASH=<hash> npm run test:repay      # Trả nợ
 ```
 
 ---
 
-## Loan Lifecycle
+## Vòng đời khoản vay
 
 ```
-Borrower                    Smart Contract                    Lender
-   │                             │                               │
-   │── createLoan() ────────────►│ [Pending UTxO]               │
-   │   (lock NFT collateral)     │  Value: NFT                  │
-   │                             │  Datum: { status: Pending }  │
-   │                             │                               │
-   │                             │◄──────────── fundLoan() ─────│
-   │◄── nhận principal ADA ──────│ [Active UTxO]                │
-   │                             │  Value: NFT + principal ADA  │
-   │                             │  Datum: { status: Active,    │
-   │                             │           due_date: ... }    │
-   │                             │                               │
-   │── repayLoan() ─────────────►│ (if before due_date)         │
-   │   (principal + interest)    │──── lender nhận ADA ────────►│
-   │◄── nhận NFT collateral ─────│                               │
-   │                             │                               │
-   │                             │ (if after due_date)           │
-   │                             │◄──────── liquidate() ─────────│
-   │                             │──── lender nhận NFT ─────────►│
+Người vay                   Smart Contract                  Người cho vay
+    │                             │                               │
+    │── Tạo khoản vay ───────────►│ [UTxO Pending]               │
+    │   (khóa NFT tài sản đảm bảo)│  Giá trị: NFT               │
+    │                             │  Datum: { status: Pending }  │
+    │                             │                               │
+    │                             │◄──────────── Cấp vốn ────────│
+    │◄── Nhận ADA (tiền vay) ─────│ [UTxO Active]                │
+    │                             │  Giá trị: NFT + ADA          │
+    │                             │  Datum: { status: Active,    │
+    │                             │           due_date: ... }    │
+    │                             │                               │
+    │── Trả nợ (trước hạn) ──────►│                              │
+    │   (gốc + lãi)               │──── Người cho vay nhận ADA ─►│
+    │◄── Nhận lại NFT ────────────│                               │
+    │                             │                               │
+    │                             │ (nếu quá hạn)                 │
+    │                             │◄────── Tịch thu tài sản ──────│
+    │                             │──── Người cho vay nhận NFT ──►│
 ```
 
 ---
 
-## Docs
+## Tài liệu
 
-- [Smart Contract Architecture](docs/smart-contract-architecture.md)
-- [App Architecture & Data Flow](docs/app-architecture.md)
-- [Installation Guide](docs/installation.md)
-- [User Guide](docs/user-guide.md)
+- [Kiến trúc Smart Contract](docs/smart-contract-architecture.md)
+- [Kiến trúc ứng dụng & Luồng dữ liệu](docs/app-architecture.md)
+- [Hướng dẫn cài đặt](docs/installation.md)
+- [Hướng dẫn sử dụng](docs/user-guide.md)
 
 ---
 
-## License
+## Giấy phép
 
 MIT
 
 ---
 
-*Built with Aiken + MeshJS · Cardano Preview Testnet · with love ❤️ from [Cardano2vn](https://cardano2vn.io)*
+*Xây dựng bằng Aiken + MeshJS · Cardano Preview Testnet · with love ❤️ from [Cardano2vn](https://cardano2vn.io)*
