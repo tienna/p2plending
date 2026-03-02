@@ -29,6 +29,7 @@ Thumbs.db
 
 # ── Claude / AI session data ─────────────────────────────────────
 .claude/
+.agents/
 
 # ── Editor ───────────────────────────────────────────────────────
 .vscode/settings.json
