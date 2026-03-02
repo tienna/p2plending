@@ -1,0 +1,35 @@
+# ── Secrets & Environment ───────────────────────────────────────
+.env
+.env.*
+!.env.example
+offchain/.env
+
+# ── Node.js ─────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Next.js ─────────────────────────────────────────────────────
+frontend/.next/
+frontend/out/
+frontend/.vercel
+frontend/next-env.d.ts
+frontend/*.tsbuildinfo
+
+# ── TypeScript build output ──────────────────────────────────────
+offchain/dist/
+
+# ── Aiken build artifacts ────────────────────────────────────────
+aiken-contract/build/
+
+# ── OS ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Claude / AI session data ─────────────────────────────────────
+.claude/
+
+# ── Editor ───────────────────────────────────────────────────────
+.vscode/settings.json
+*.swp

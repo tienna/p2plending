@@ -1,0 +1,26 @@
+{
+  "name": "p2p-lending-offchain",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "deploy-ref": "tsx scripts/deploy-reference-script.ts",
+    "mint-nft": "tsx scripts/mint-collateral-nft.ts",
+    "test:create": "tsx scripts/test-create.ts",
+    "test:fund": "tsx scripts/test-fund.ts",
+    "test:repay": "tsx scripts/test-repay.ts",
+    "test:liquidate": "tsx scripts/test-liquidate.ts",
+    "test:cancel": "tsx scripts/test-cancel.ts"
+  },
+  "dependencies": {
+    "@meshsdk/core": "1.9.0-beta.100",
+    "@meshsdk/core-cst": "1.9.0-beta.100",
+    "@meshsdk/transaction": "1.9.0-beta.100",
+    "@meshsdk/wallet": "1.9.0-beta.100",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.5",
+    "@types/node": "^20.12.7"
+  }
+}
